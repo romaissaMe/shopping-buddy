@@ -1,2 +1,3 @@
 product_data.csv
 .env
+__pycache__/
