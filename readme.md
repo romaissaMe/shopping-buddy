@@ -5,4 +5,4 @@ By utilizing the power of product embeddings and large language models exploitin
 
 <img
   src="./display.png"
-  style="display: inline-block, margin: 0 auto">
+  style="display: inline-block;margin: 0 auto ; max-width:500px">
