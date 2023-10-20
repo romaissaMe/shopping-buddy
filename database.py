@@ -8,8 +8,8 @@ redis_key = os.getenv('REDIS_KEY')
 
 
 redis_conn = redis.Redis(
-  host='redis-10923.c10.us-east-1-4.ec2.cloud.redislabs.com',
-  port=10923,
+  host='redis-12882.c259.us-central1-2.gce.cloud.redislabs.com',
+  port=12882,
   password=redis_key)
 
 print('connected to redis')
