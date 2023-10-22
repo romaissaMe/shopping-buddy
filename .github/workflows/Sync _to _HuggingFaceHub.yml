@@ -17,4 +17,4 @@ jobs:
       - name: Push to hub
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
-        run: git push https://RomyMy:$HF_TOKEN@huggingface.co/spaces/RomyMy/EcomShoppingBuddy main
+        run: git push --force https://RomyMy:$HF_TOKEN@huggingface.co/spaces/RomyMy/EcomShoppingBuddy main
