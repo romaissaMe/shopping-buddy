@@ -8,6 +8,7 @@ from database import redis_conn
 from utilities import create_flat_index, load_vectors
 
 
+
 #set maximum length for text fields
 MAX_TEXT_LENGTH = 512
 
