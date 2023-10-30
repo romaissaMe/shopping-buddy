@@ -1,13 +1,16 @@
-import redis
 import os
+
+import redis
 from dotenv import load_dotenv
 
 load_dotenv()
-redis_key = os.getenv('REDIS_KEY')
 
 
-
-redis_conn = redis.Redis(
-  host='redis-12882.c259.us-central1-2.gce.cloud.redislabs.com',
-  port=12882,
-  password=redis_key)
+def create_redis():
+    return redis.ConnectionPool(
+        host=os.getenv("REDIS_HOST"),
+        port=os.getenv("REDIS_PORT"),
+        password=os.getenv("REDIS_KEY"),
+        db=0,
+        decode_responses=True,
+    )
