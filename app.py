@@ -30,49 +30,53 @@ ITEM_KEYWORD_EMBEDDING = "item_vector"
 TOPK = 5
 
 
+# connect to redis database
+@st.cache_resource()
+def connect_to_redis():
+    pool = create_redis()
+    return redis.Redis(connection_pool=pool)
+
+
+# the encoding keywords chain
+@st.cache_resource()
+def encode_keywords_chain():
+    llm = HuggingFaceHub(
+        repo_id=FALCON_REPO_ID,
+        model_kwargs={"temperature": FALCON_TEMPERATURE, "max_new_tokens": FALCON_MAX_TOKENS},
+        huggingfacehub_api_token=HUGGINGFACEHUB_API_TOKEN,
+    )
+    prompt = PromptTemplate(
+        input_variables=["product_description"],
+        template=TEMPLATE_1,
+    )
+    chain = LLMChain(llm=llm, prompt=prompt)
+    return chain
+
+
+# the present products chain
+@st.cache_resource()
+def present_products_chain():
+    template = TEMPLATE_2
+    memory = ConversationBufferMemory(memory_key="chat_history")
+    prompt = PromptTemplate(input_variables=["chat_history", "user_msg"], template=template)
+    chain = LLMChain(
+        llm=ChatOpenAI(
+            openai_api_key=os.getenv("OPENAI_API_KEY"), temperature=OPENAI_TEMPERATURE, model=OPENAI_MODEL_NAME
+        ),
+        prompt=prompt,
+        verbose=False,
+        memory=memory,
+    )
+    return chain
+
+
+@st.cache_resource()
+def instance_embedding_model():
+    embedding_model = SentenceTransformer(EMBEDDING_MODEL_NAME)
+    return embedding_model
+
+
 def main():
-    # connect to redis database
-    @st.cache_resource()
-    def connect_to_redis():
-        pool = create_redis()
-        return redis.Redis(connection_pool=pool)
-
-    # the encoding keywords chain
-    @st.cache_resource()
-    def encode_keywords_chain():
-        falcon_llm_1 = HuggingFaceHub(
-            repo_id=FALCON_REPO_ID,
-            model_kwargs={"temperature": FALCON_TEMPERATURE, "max_new_tokens": FALCON_MAX_TOKENS},
-            huggingfacehub_api_token=HUGGINGFACEHUB_API_TOKEN,
-        )
-        prompt = PromptTemplate(
-            input_variables=["product_description"],
-            template=TEMPLATE_1,
-        )
-        chain = LLMChain(llm=falcon_llm_1, prompt=prompt)
-        return chain
-
-    # the present products chain
-    @st.cache_resource()
-    def present_products_chain():
-        template = TEMPLATE_2
-        prompt = PromptTemplate(input_variables=["chat_history", "user_msg"], template=template)
-        memory = ConversationBufferMemory(memory_key="chat_history")
-        llm_chain = LLMChain(
-            llm=ChatOpenAI(
-                openai_api_key=os.getenv("OPENAI_API_KEY"), temperature=OPENAI_TEMPERATURE, model=OPENAI_MODEL_NAME
-            ),
-            prompt=prompt,
-            verbose=False,
-            memory=memory,
-        )
-        return llm_chain
-
-    @st.cache_resource()
-    def instance_embedding_model():
-        embedding_model = SentenceTransformer(EMBEDDING_MODEL_NAME)
-        return embedding_model
-
     st.title("My Amazon shopping buddy 🏷️")
     st.caption("🤖 Powered by Falcon Open Source AI model")
     redis_conn = connect_to_redis()
