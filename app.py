@@ -1,9 +1,6 @@
-import os
-
 import numpy as np
 import redis
 import streamlit as st
-from dotenv import load_dotenv
 from langchain import HuggingFaceHub
 from langchain.chains import LLMChain
 from langchain.chat_models import ChatOpenAI
@@ -17,17 +14,16 @@ from constants import (
     FALCON_MAX_TOKENS,
     FALCON_REPO_ID,
     FALCON_TEMPERATURE,
+    HUGGINGFACEHUB_API_TOKEN,
+    ITEM_KEYWORD_EMBEDDING,
+    OPENAI_API_KEY,
     OPENAI_MODEL_NAME,
     OPENAI_TEMPERATURE,
     TEMPLATE_1,
     TEMPLATE_2,
+    TOPK,
 )
 from database import create_redis
-
-load_dotenv()
-HUGGINGFACEHUB_API_TOKEN = os.getenv("HUGGINGFACEHUB_API_TOKEN")
-ITEM_KEYWORD_EMBEDDING = "item_vector"
-TOPK = 5
 
 
 # connect to redis database
@@ -54,15 +50,12 @@ def encode_keywords_chain():
 
 
 # the present products chain
-@st.cache_resource()
 def present_products_chain():
     template = TEMPLATE_2
     memory = ConversationBufferMemory(memory_key="chat_history")
     prompt = PromptTemplate(input_variables=["chat_history", "user_msg"], template=template)
     chain = LLMChain(
-        llm=ChatOpenAI(
-            openai_api_key=os.getenv("OPENAI_API_KEY"), temperature=OPENAI_TEMPERATURE, model=OPENAI_MODEL_NAME
-        ),
+        llm=ChatOpenAI(openai_api_key=OPENAI_API_KEY, temperature=OPENAI_TEMPERATURE, model=OPENAI_MODEL_NAME),
         prompt=prompt,
         verbose=False,
         memory=memory,
@@ -81,7 +74,11 @@ def main():
     st.caption("🤖 Powered by Falcon Open Source AI model")
     redis_conn = connect_to_redis()
     keywords_chain = encode_keywords_chain()
-    chat_chain = present_products_chain()
+
+    if "window_refreshed" not in st.session_state:
+        st.session_state.window_refreshed = True
+        st.session_state.chat_chain = present_products_chain()
+
     embedding_model = instance_embedding_model()
 
     if "messages" not in st.session_state:
@@ -102,7 +99,6 @@ def main():
         query_vector = embedding_model.encode(keywords)
         query_vector_bytes = np.array(query_vector).astype(np.float32).tobytes()
         # prepare the query
-
         q = (
             Query(f"*=>[KNN {TOPK} @{ITEM_KEYWORD_EMBEDDING} $vec_param AS vector_score]")
             .sort_by("vector_score")
@@ -116,7 +112,7 @@ def main():
         result_output = ""
         for product in results.docs:
             result_output += f"product_name:{product.item_name}, product_description:{product.item_keywords} \n"
-        result = chat_chain.predict(user_msg=f"{result_output}\n{prompt}")
+        result = st.session_state.chat_chain.predict(user_msg=f"{result_output}\n{prompt}")
         st.session_state.messages.append({"role": "assistant", "content": result})
         st.chat_message("assistant").write(result)
 
