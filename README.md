@@ -67,7 +67,9 @@ Before running the main application, preprocess and import your data into a data
 ```bash
 python preprocess.py
 ```
-[data_link](https://drive.google.com/file/d/1tHWB6u3yQCuAgOYc-DxtZ8Mru3uV5_lj/view)
+
+Download the data as csv file from [here](https://drive.google.com/file/d/1tHWB6u3yQCuAgOYc-DxtZ8Mru3uV5_lj/view) and name it 'product_data.csv'.
+This dataset comprises Amazon products information including item ID, item name, item keywords, product type...
 
 ## Running the Application
 
