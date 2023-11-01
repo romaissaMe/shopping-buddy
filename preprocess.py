@@ -12,15 +12,14 @@ from constants import (
 from database import create_redis
 from utils import create_flat_index, load_vectors
 
-pool = create_redis()
-redis_conn = redis.Redis(connection_pool=pool)
-
 
 def auto_truncate(text: str):
     return text[0:MAX_TEXT_LENGTH]
 
 
 def data_preprocessing_and_loading():
+    pool = create_redis()
+    redis_conn = redis.Redis(connection_pool=pool)
     data = pd.read_csv(
         DATA_PATH,
         converters={"bullet_point": auto_truncate, "item_keywords": auto_truncate, "item_name": auto_truncate},
