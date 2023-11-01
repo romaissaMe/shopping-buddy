@@ -77,7 +77,7 @@ def main():
 
     if "window_refreshed" not in st.session_state:
         st.session_state.window_refreshed = True
-        st.session_state.chat_chain = present_products_chain()
+        st.session_state.present_products_chain = present_products_chain()
 
     embedding_model = instance_embedding_model()
 
@@ -112,7 +112,7 @@ def main():
         result_output = ""
         for product in results.docs:
             result_output += f"product_name:{product.item_name}, product_description:{product.item_keywords} \n"
-        result = st.session_state.chat_chain.predict(user_msg=f"{result_output}\n{prompt}")
+        result = st.session_state.present_products_chain.predict(user_msg=f"{result_output}\n{prompt}")
         st.session_state.messages.append({"role": "assistant", "content": result})
         st.chat_message("assistant").write(result)
 
