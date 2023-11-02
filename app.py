@@ -103,7 +103,7 @@ def main():
             Query(f"*=>[KNN {TOPK} @{ITEM_KEYWORD_EMBEDDING} $vec_param AS vector_score]")
             .sort_by("vector_score")
             .paging(0, TOPK)
-            .return_fields("vector_score", "item_name", "item_id", "item_keywords")
+            .return_fields("vector_score", "item_name", "item_keywords")
             .dialect(2)
         )
         params_dict = {"vec_param": query_vector_bytes}
