@@ -13,8 +13,8 @@ pinned: false
 ## Overview:
 
 This project leverages [Falcon LLM](https://falconllm.tii.ae/), [OpenAI](openai.com) API, [Sentence Transformer](https://www.sbert.net/docs/installation.html#install-sentencetransformers), [Hugging Face Hub](https://huggingface.co/) and [Streamlit](https://docs.streamlit.io/) to build and deploy a chatbot shopping assistant application. It relies on a dataset of Amazon products to provide tailored product recommendations aligned with user's needs. The application uses [Langchain](https://www.langchain.com/) to integrate those diverse functionalities. Data preprocessing, embedding generation, and storage in Redis are also essential components of this project.
-More details about the project are provided in [this blog post](insertalink.com).  
-You can test the application by visiting [Shopping Buddy](https://huggingface.co/spaces/RomyMy/EcomShoppingBuddy).  
+More details about the project are provided in [this blog post](https://medium.com/@roumamedj/shopping-buddy-767458f752f9).
+You can test the application by visiting [Shopping Buddy](https://huggingface.co/spaces/RomyMy/EcomShoppingBuddy).
 
 ## Table of Contents
 
